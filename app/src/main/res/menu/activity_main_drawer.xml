@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title ="@string/navigation_tools_name">
+        <menu>
+        <group android:checkableBehavior="single">
+
+                <item
+                    android:id="@+id/nav_table_month"
+                    android:title="@string/navigation_tools_month"
+                    android:icon="@drawable/ic_month"/>
+                <item
+                    android:id="@+id/nav_table_year"
+                    android:title="@string/navigation_tools_year"
+                    android:icon="@drawable/ic_year"/>
+
+        </group>
+        </menu>
+    </item>
+
+    <item android:title="@string/navigation_others">
+        <menu>
+        <item
+            android:id="@+id/nav_sync"
+            android:title="@string/navigation_sync"
+            android:icon="@drawable/ic_sync"/>
+        <item
+            android:id="@+id/nav_settings"
+            android:title="@string/navigation_settings"
+            android:icon="@drawable/ic_settings_black"/>
+        </menu>
+    </item>
+
+</menu>

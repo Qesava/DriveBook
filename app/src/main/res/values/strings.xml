@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">DriveBook</string>
+
+    <string name="nav_header_dev_name">rapifails@googlemail.com</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="navigation_tools_name">Tools</string>
+    <string name="navigation_tools_month">Monat</string>
+    <string name="navigation_tools_year">Jahr</string>
+
+    <string name="navigation_sync">Synchronisation</string>
+    <string name="navigation_settings">Einstellungen</string>
+    <string name="nav_header_acc_name">Platzhalter</string>
+    <string name="navigation_others">Weiteres</string>
+    <string name="action_settings">Einstellungen</string>
+</resources>
