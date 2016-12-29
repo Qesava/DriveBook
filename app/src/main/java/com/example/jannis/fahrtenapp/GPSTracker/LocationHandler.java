@@ -1,15 +1,21 @@
 package com.example.jannis.fahrtenapp.GPSTracker;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+import android.widget.Toast;
 
-public class LocationHandler {
+import com.example.jannis.fahrtenapp.SaveData.ExternalFiles.TestFile;
+
+public class LocationHandler extends AsyncTask {
     private LocationManager locationmanager;
     private LocationListener locationlistener;
     private Context mContext;
@@ -77,6 +83,7 @@ public class LocationHandler {
             return;
         }
         locationmanager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationlistener);
+        //locationmanager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationlistener);
     }
 
     public void stopListening() {
@@ -91,7 +98,14 @@ public class LocationHandler {
             return;
         }
         locationmanager.removeUpdates(locationlistener);
+        Log.i("INFO", "Distance walked: " + String.valueOf(locationCalculator.getDistance()));
+        TestFile testFile = new TestFile((Activity) mContext);
+        testFile.saveToFile(locationCalculator.getDistance());
         locationCalculator.clearAll();
     }
 
+    @Override
+    protected Object doInBackground(Object[] params) {
+        return this;
+    }
 }

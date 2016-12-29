@@ -43,6 +43,10 @@ public class LocationCalculator {
         distance = 0;
     }
 
+    public double getDistance() {
+        return this.distance;
+    }
+
     public boolean isLocationNull() {
         return location == null;
     }
