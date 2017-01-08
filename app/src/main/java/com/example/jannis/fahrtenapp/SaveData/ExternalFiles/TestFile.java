@@ -16,8 +16,7 @@ import java.util.Locale;
 
 public class TestFile {
     private Calendar timestamp;
-    Activity activity;
-    private File dir;
+    private Activity activity;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -60,7 +59,7 @@ public class TestFile {
     public void saveToFile(double distance) {
         verifyStoragePermissions();
         if (isExternalStorageWritable()) {
-            dir = creatFileDirectory();
+            File dir = creatFileDirectory();
             File text = new File(dir, "Logs.txt");
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(text);

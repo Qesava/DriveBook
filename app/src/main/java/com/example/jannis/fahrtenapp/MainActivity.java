@@ -57,13 +57,13 @@ public class MainActivity extends AppCompatActivity
                     //MainActivity.this.registerReceiver(new BTBroadcastReceiver(), filter);
 
                     Object obj = new LocationHandler(MainActivity.this);
-                    locationHandler = (LocationHandler) obj;
+                    //locationHandler = (LocationHandler) obj;
                     //locationHandler = new LocationHandler(MainActivity.this);
-                    locationHandler.startListening();
+                    //locationHandler.startListening();
                     toggled = true;
                     btn.setText("Stop");
                 } else {
-                    locationHandler.stopListening();
+                    //locationHandler.stopListening();
                     btn.setText("Start");
                     toggled = false;
                 }
