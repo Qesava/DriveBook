@@ -1,6 +1,8 @@
 package com.example.jannis.fahrtenapp;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -16,17 +18,55 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.jannis.fahrtenapp.BTTracker.BTBroadcastReceiver;
 import com.example.jannis.fahrtenapp.DataDisplays.MonthDisplay.MonthDisplayActivity;
 import com.example.jannis.fahrtenapp.DataDisplays.YearDisplay.YearDisplayActivity;
 import com.example.jannis.fahrtenapp.GPSTracker.LocationHandler;
+import com.example.jannis.fahrtenapp.SaveData.ExternalFiles.TestFile;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     Button btn;
     LocationHandler locationHandler = null;
     boolean toggled = false;
+    Intent intent;
+    MyReceiver myReceiver;
+
+    private class MyReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            // TODO Auto-generated method stub
+
+            //int datapassed = arg1.getIntExtra("DATAPASSED", 0);
+            Bundle extras = getIntent().getExtras();
+            int datapassed = Integer.valueOf(extras.getString("DATAPASSED"));
+            TestFile test = new TestFile(MainActivity.this);
+            test.saveToFile(datapassed);
+            Toast.makeText(MainActivity.this,
+                    "Triggered by Service!\n"
+                            + "Data passed: " + String.valueOf(datapassed),
+                    Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        myReceiver = new MyReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(LocationHandler.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(myReceiver);
+        super.onStop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,20 +90,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 if (toggled == false) {
-                    //IntentFilter filter = new IntentFilter();
-                    //filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-                    //filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-                    //filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-                    //MainActivity.this.registerReceiver(new BTBroadcastReceiver(), filter);
-
-                    Object obj = new LocationHandler(MainActivity.this);
-                    //locationHandler = (LocationHandler) obj;
-                    //locationHandler = new LocationHandler(MainActivity.this);
-                    //locationHandler.startListening();
+                    intent = new Intent(MainActivity.this, LocationHandler.class);
+                    startService(intent);
+                    /*
+                    IntentFilter filter = new IntentFilter();
+                    filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+                    filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+                    filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+                    MainActivity.this.registerReceiver(new BTBroadcastReceiver(), filter);*/
                     toggled = true;
                     btn.setText("Stop");
                 } else {
-                    //locationHandler.stopListening();
+                    stopService(intent);
                     btn.setText("Start");
                     toggled = false;
                 }

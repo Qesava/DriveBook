@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.example.jannis.fahrtenapp.SaveData.ExternalFiles.TestFile;
 
+import junit.framework.Test;
+
 public class LocationHandler extends Service {
 
     private static final int ONE_MINUTE = 1000 * 60 * 1;
@@ -34,7 +36,7 @@ public class LocationHandler extends Service {
     public static Boolean isRunning = false;
     PowerManager.WakeLock wakeLock;
 
-    private LocationCalculator mLocationCalculator;
+    public final static String MY_ACTION = "MY_ACTION";
 
     public LocationHandler() {
     }
@@ -61,29 +63,35 @@ public class LocationHandler extends Service {
         Log.e("Google", "Service Created");
     }
 
-    Handler mHandler = new Handler();
-    Runnable mHandlerTask = new Runnable() {
-        @Override
-        public void run() {
-            if (!isRunning) {
-                startListening();
-            }
-            mHandler.postDelayed(mHandlerTask, ONE_MINUTE);
-        }
-    };
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mHandlerTask.run();
+        if (!isRunning) {
+            startListening();
+        }
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         stopListening();
-        mHandler.removeCallbacks(mHandlerTask);
+        MyThread myThread = new MyThread();
+        myThread.start();
+        mLocationEntityManager = new LocationEntityManager();
         super.onDestroy();
         wakeLock.release();
+    }
+
+    public class MyThread extends Thread {
+
+        @Override
+        public void run() {
+            Intent intent = new Intent();
+            intent.setAction(MY_ACTION);
+            intent.putExtra("DATAPASSED", mLocationEntityManager.getDistance());
+            sendBroadcast(intent);
+            stopSelf();
+        }
+
     }
 
     public class LocationUpdaterListener implements LocationListener {
@@ -93,33 +101,15 @@ public class LocationHandler extends Service {
                 previousBestLocation = location;
                 try {
                     mLocationEntityManager.addLocation(location);
-                    
+                    mLocationEntityManager.addDistance((long) location.distanceTo(mLocationEntityManager.getLocation(mLocationEntityManager.getLocationsSize() - 1)));
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
                     stopListening();
-                }
-            }
-            /*
-            if (mLocationCalculator.isLocationNull() || mLocationCalculator.isNewerLocationNull()) {
-                if (mLocationCalculator.isLocationNull()) {
-                    mLocationCalculator.setLocation(location);
-                } else {
-                    mLocationCalculator.setNewer_location(location);
-                }
-            } else {
-                if (isBetterLocation(mLocationCalculator.getLocation(), mLocationCalculator.getNewer_location())) {
-                    mLocationCalculator.setNewer_location(location);
-                } else {
-                    mLocationCalculator.setLocation(location);
-                }
-            }
-            if (mLocationCalculator.isLocationNull() || mLocationCalculator.isNewerLocationNull()) {
 
-            } else {
-                mLocationCalculator.calculateDistance();
+                }
             }
-            */
         }
 
         @Override

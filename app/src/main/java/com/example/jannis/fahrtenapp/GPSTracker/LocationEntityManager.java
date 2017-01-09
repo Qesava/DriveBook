@@ -14,6 +14,10 @@ public class LocationEntityManager implements Serializable {
         distance = 0;
     }
 
+    public int getLocationsSize() {
+        return locations.size();
+    }
+
     public long getDistance() {
         return distance;
     }
