@@ -33,6 +33,10 @@ public class GPSLocationDataSource {
         database = dbHelper.getWritableDatabase();
     }
 
+    public void openRead() {
+        database = dbHelper.getReadableDatabase();
+    }
+
     public void close() {
         dbHelper.close();
     }

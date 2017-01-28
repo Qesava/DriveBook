@@ -10,14 +10,15 @@ import java.util.List;
  */
 
 public class MyLocationManager {
-    private static final MyLocationManager m_locationManagerInstance = new MyLocationManager();
+    //private static final MyLocationManager m_locationManagerInstance = new MyLocationManager();
     private List<Location> locations;
 
+    /*
     public static MyLocationManager getLocationInstance() {
         return m_locationManagerInstance;
-    }
+    }*/
 
-    private MyLocationManager() {
+    public MyLocationManager() {
         locations = new ArrayList<>();
     }
 
@@ -33,7 +34,15 @@ public class MyLocationManager {
         return locations.size();
     }
 
+    public List getLocationList() {
+        return locations;
+    }
+
     public void clearLocations() {
         locations.clear();
+    }
+
+    public void setLocationList(List list) {
+        locations = list;
     }
 }
