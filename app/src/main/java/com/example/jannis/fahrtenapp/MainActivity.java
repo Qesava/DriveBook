@@ -1,14 +1,14 @@
 package com.example.jannis.fahrtenapp;
 
-import android.bluetooth.BluetoothDevice;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ShareCompat;
-import android.support.v4.content.IntentCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,9 +20,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.jannis.fahrtenapp.BTTracker.BTBroadcastReceiver;
 import com.example.jannis.fahrtenapp.DataDisplays.MonthDisplay.MonthDisplayActivity;
 import com.example.jannis.fahrtenapp.DataDisplays.YearDisplay.YearDisplayActivity;
+import com.example.jannis.fahrtenapp.Entity.DistanceManager;
+import com.example.jannis.fahrtenapp.Entity.MyLocationManager;
 import com.example.jannis.fahrtenapp.GPSTracker.LocationHandler;
 import com.example.jannis.fahrtenapp.SaveData.ExternalFiles.TestFile;
 
@@ -32,39 +33,16 @@ public class MainActivity extends AppCompatActivity
     LocationHandler locationHandler = null;
     boolean toggled = false;
     Intent intent;
-    MyReceiver myReceiver;
+    int ONGOING_NOTIFICATION_ID = 1;
 
-    private class MyReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context arg0, Intent arg1) {
-            // TODO Auto-generated method stub
-
-            //int datapassed = arg1.getIntExtra("DATAPASSED", 0);
-            Bundle extras = getIntent().getExtras();
-            int datapassed = Integer.valueOf(extras.getString("DATAPASSED"));
-            TestFile test = new TestFile(MainActivity.this);
-            test.saveToFile(datapassed);
-            Toast.makeText(MainActivity.this,
-                    "Triggered by Service!\n"
-                            + "Data passed: " + String.valueOf(datapassed),
-                    Toast.LENGTH_LONG).show();
-
-        }
-    }
 
     @Override
     protected void onStart() {
-        myReceiver = new MyReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(LocationHandler.MY_ACTION);
-        registerReceiver(myReceiver, intentFilter);
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        unregisterReceiver(myReceiver);
         super.onStop();
     }
 
@@ -92,6 +70,8 @@ public class MainActivity extends AppCompatActivity
                 if (toggled == false) {
                     intent = new Intent(MainActivity.this, LocationHandler.class);
                     startService(intent);
+
+
                     /*
                     IntentFilter filter = new IntentFilter();
                     filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
@@ -101,7 +81,21 @@ public class MainActivity extends AppCompatActivity
                     toggled = true;
                     btn.setText("Stop");
                 } else {
+                    intent = new Intent(MainActivity.this, LocationHandler.class);
                     stopService(intent);
+
+                    MyLocationManager managers = MyLocationManager.getLocationInstance();
+
+                    float datapassed = DistanceManager.testdistancemanager;
+                    TestFile test = new TestFile(MainActivity.this);
+                    //test.saveToFile(datapassed);
+                    Toast.makeText(MainActivity.this,
+                            "Triggered by Service!\n"
+                                    + "Data passed: " + String.valueOf(datapassed),
+                            Toast.LENGTH_LONG).show();
+                    MyLocationManager.getLocationInstance().clearLocations();
+                    DistanceManager.getDistanceMangerInstance().clearDistance();
+
                     btn.setText("Start");
                     toggled = false;
                 }
