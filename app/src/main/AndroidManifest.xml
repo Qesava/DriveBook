@@ -22,7 +22,8 @@
 
         <service
             android:name=".GPSTracker.LocationHandler"
-            android:process=":locationhandler_service" />
+            android:process=":locationhandler_service"
+            android:icon="@drawable/ic_navigation_black_24dp" />
 
         <receiver
             android:name=".BTTracker.BTBroadcastReceiver"

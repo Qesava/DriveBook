@@ -1,12 +1,6 @@
 package com.example.jannis.fahrtenapp;
 
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,33 +12,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.example.jannis.fahrtenapp.DataDisplays.MonthDisplay.MonthDisplayActivity;
 import com.example.jannis.fahrtenapp.DataDisplays.YearDisplay.YearDisplayActivity;
-import com.example.jannis.fahrtenapp.Entity.DistanceManager;
-import com.example.jannis.fahrtenapp.Entity.MyLocationManager;
 import com.example.jannis.fahrtenapp.GPSTracker.LocationHandler;
-import com.example.jannis.fahrtenapp.SaveData.ExternalFiles.TestFile;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     Button btn;
-    LocationHandler locationHandler = null;
     boolean toggled = false;
     Intent intent;
-    int ONGOING_NOTIFICATION_ID = 1;
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +39,13 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         btn = (Button) findViewById(R.id.btngo);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (toggled == false) {
+                if (!toggled) {
                     intent = new Intent(MainActivity.this, LocationHandler.class);
                     startService(intent);
-
 
                     /*
                     IntentFilter filter = new IntentFilter();
@@ -83,18 +58,6 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     intent = new Intent(MainActivity.this, LocationHandler.class);
                     stopService(intent);
-
-                    MyLocationManager managers = MyLocationManager.getLocationInstance();
-
-                    float datapassed = DistanceManager.testdistancemanager;
-                    TestFile test = new TestFile(MainActivity.this);
-                    //test.saveToFile(datapassed);
-                    Toast.makeText(MainActivity.this,
-                            "Triggered by Service!\n"
-                                    + "Data passed: " + String.valueOf(datapassed),
-                            Toast.LENGTH_LONG).show();
-                    MyLocationManager.getLocationInstance().clearLocations();
-                    DistanceManager.getDistanceMangerInstance().clearDistance();
 
                     btn.setText("Start");
                     toggled = false;

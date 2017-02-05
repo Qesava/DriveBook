@@ -16,7 +16,7 @@
     <string name="navigation_others">Weiteres</string>
     <string name="action_settings">Einstellungen</string>
     <string name="title_activity_month_display">MonthDisplayActivity</string>
-    <string name="title_activity_year_display">YearDisplayActivity</string>
+    <string name="title_activity_year_display">Fahrten dieses Jahr</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->

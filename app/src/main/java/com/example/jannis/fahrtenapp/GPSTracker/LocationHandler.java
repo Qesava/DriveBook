@@ -1,8 +1,6 @@
 package com.example.jannis.fahrtenapp.GPSTracker;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -16,12 +14,9 @@ import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.jannis.fahrtenapp.Entity.DistanceManager;
+import com.example.jannis.fahrtenapp.Entity.Distance;
 import com.example.jannis.fahrtenapp.Entity.MyLocationManager;
-import com.example.jannis.fahrtenapp.MainActivity;
-import com.example.jannis.fahrtenapp.R;
 import com.example.jannis.fahrtenapp.SaveData.Database.GPSLocationDataSource;
 import com.example.jannis.fahrtenapp.SaveData.ExternalFiles.TestFile;
 
@@ -32,8 +27,9 @@ public class LocationHandler extends Service {
     private LocationManager mLocationManager;
     public LocationUpdaterListener mLocationListener;
     private MyLocationManager m_locationManger;
-    private DistanceManager m_distanceManager;
+    private Distance m_distanceManager;
     public Location previousBestLocation = null;
+    private long startTime = 0;
 
     public static Boolean isRunning = false;
     private int firsttime = 0;
@@ -54,10 +50,11 @@ public class LocationHandler extends Service {
                         m_distanceManager.addDistance(location.distanceTo(m_locationManger.getLocationByIndex(m_locationManger.getLocationsSize() - 1)));
                     } else {
                         firsttime++;
+                        startTime = location.getTime();
                     }
                     m_locationManger.addLocation(location);
                     dataSource.createLocation(location);
-                    Log.i("service distance walked", String.valueOf(m_distanceManager.getDistance()));
+                    Log.i("LocationHandler", "Distance walked: " + String.valueOf(m_distanceManager.getDistance()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -87,8 +84,8 @@ public class LocationHandler extends Service {
     public void onCreate() {
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mLocationListener = new LocationUpdaterListener();
-        m_locationManger = MyLocationManager.getLocationInstance();
-        m_distanceManager = DistanceManager.getDistanceMangerInstance();
+        m_locationManger = new MyLocationManager();
+        m_distanceManager = new Distance();
 
         dataSource = new GPSLocationDataSource(getApplicationContext());
         super.onCreate();
@@ -99,7 +96,7 @@ public class LocationHandler extends Service {
         //Toast.makeText(getApplicationContext(), "Service Created",
         //Toast.LENGTH_SHORT).show();
 
-        Log.e("Google", "Service Created");
+        Log.i("LocationHandler", "Service Created");
     }
 
     @Override
@@ -114,20 +111,21 @@ public class LocationHandler extends Service {
     @Override
     public void onDestroy() {
         stopListening();
-        float datapassed = DistanceManager.testdistancemanager;
-        TestFile test = new TestFile();
-        test.saveToFile(datapassed);
+        float distance = m_distanceManager.getDistance();
+        if (previousBestLocation != null) {
+            dataSource.createDistance(distance, startTime, previousBestLocation.getTime());
+            Log.i("LocationHandler", "Distance added to Database: " + distance);
+        }
         dataSource.close();
         super.onDestroy();
+        Log.i("LocationHandler", "Service Destroyed");
         //wakeLock.release();
     }
 
 
     private void startListening() {
-        Log.i("service", "startListening()");
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.i("service", "permission granted");
             //if (mLocationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) {
             //    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
             //    Log.i("register","newtworkprovider started listening");
@@ -135,7 +133,7 @@ public class LocationHandler extends Service {
 
             if (mLocationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)) {
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
-                Log.i("register", "gpsprovider started listening");
+                Log.i("LocationHandler", "Service started Listening on GPS");
             }
 
         }
@@ -146,7 +144,7 @@ public class LocationHandler extends Service {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationManager.removeUpdates(mLocationListener);
-            Log.i("unregister", "stoped listening");
+            Log.i("LocationHandler", "Service stopped Listening");
         }
         isRunning = false;
     }

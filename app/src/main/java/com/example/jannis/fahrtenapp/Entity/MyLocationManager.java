@@ -5,18 +5,8 @@ import android.location.Location;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jannis on 24.01.2017.
- */
-
 public class MyLocationManager {
-    //private static final MyLocationManager m_locationManagerInstance = new MyLocationManager();
     private List<Location> locations;
-
-    /*
-    public static MyLocationManager getLocationInstance() {
-        return m_locationManagerInstance;
-    }*/
 
     public MyLocationManager() {
         locations = new ArrayList<>();
@@ -42,7 +32,7 @@ public class MyLocationManager {
         locations.clear();
     }
 
-    public void setLocationList(List list) {
+    public void setLocationList(List<Location> list) {
         locations = list;
     }
 }
