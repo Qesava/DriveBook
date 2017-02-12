@@ -1,16 +1,20 @@
 package com.example.jannis.fahrtenapp.DataDisplays.YearDisplay;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.jannis.fahrtenapp.Entity.Distance;
+import com.example.jannis.fahrtenapp.Entity.MyLocationManager;
 import com.example.jannis.fahrtenapp.R;
 import com.example.jannis.fahrtenapp.SaveData.Database.GPSLocationDataSource;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,10 +23,12 @@ import java.util.Locale;
 public class YearDisplayActivity extends AppCompatActivity {
 
     private GPSLocationDataSource dataSource;
-    //private MyLocationManager locationManager;
+    private List<Location> locations;
     private List<Distance> distances;
     private ListView listView;
-
+    private View header;
+    private View header2;
+    private boolean secList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +37,11 @@ public class YearDisplayActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        secList = false;
+
+        header = getLayoutInflater().inflate(R.layout.listview_header_year, null, false);
+        header2 = getLayoutInflater().inflate(R.layout.listview_header_year_location, null, false);
 
         listView = (ListView) findViewById(R.id.yearListView);
 
@@ -41,6 +52,8 @@ public class YearDisplayActivity extends AppCompatActivity {
 
         filterThisYearDistances();
         fillList();
+
+
     }
 
     private void filterThisYearDistances() {
@@ -56,10 +69,43 @@ public class YearDisplayActivity extends AppCompatActivity {
 
     private void fillList() {
         YearViewAdapter adapter = new YearViewAdapter(this, R.layout.listview_item_year, distances);
-        View header = getLayoutInflater().inflate(R.layout.listview_header_year, null);
+        if (listView.getHeaderViewsCount() > 0) {
+            listView.removeHeaderView(header2);
+        }
         listView.addHeaderView(header);
         listView.setAdapter(adapter);
-        //listView.setOnItemClickListener(null);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position != 0) {
+                    dataSource.openRead();
+                    locations = dataSource.getLocationsByKey(distances.get(position - 1).getId());
+                    fillLocList();
+                    dataSource.close();
+                }
+            }
+        });
     }
 
+    private void fillLocList() {
+        YearViewAdapterLocations adapterLocations =
+                new YearViewAdapterLocations(this, R.layout.listview_item_year_location, locations);
+        if (listView.getHeaderViewsCount() > 0) {
+            listView.removeHeaderView(header);
+        }
+        listView.addHeaderView(header2);
+        listView.setAdapter(adapterLocations);
+        listView.setOnItemClickListener(null);
+        secList = true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (secList) {
+            secList = false;
+            fillList();
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

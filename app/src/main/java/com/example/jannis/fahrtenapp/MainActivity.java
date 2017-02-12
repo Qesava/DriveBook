@@ -46,13 +46,6 @@ public class MainActivity extends AppCompatActivity
                 if (!toggled) {
                     intent = new Intent(MainActivity.this, LocationHandler.class);
                     startService(intent);
-
-                    /*
-                    IntentFilter filter = new IntentFilter();
-                    filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-                    filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-                    filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-                    MainActivity.this.registerReceiver(new BTBroadcastReceiver(), filter);*/
                     toggled = true;
                     btn.setText("Stop");
                 } else {

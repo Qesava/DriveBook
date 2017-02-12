@@ -20,11 +20,11 @@ public class BTBroadcastReceiver extends BroadcastReceiver {
         if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
             //Device is now connected
             //TODO: add bluetoothname
-            if (device.getName().equals("BM-E9")) {
+            //if (device.getName().equals("BM-E9")) {
                 intent1 = new Intent(context, LocationHandler.class);
                 context.startService(intent1);
                 Log.i("Info BTReceiver", "Bluetooth connected");
-            }
+            //}
         } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
             //Device is about to disconnect
                 Log.i("Info BTReceiver", "Bluetooth about to disconnect");

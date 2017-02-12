@@ -53,7 +53,6 @@ public class LocationHandler extends Service {
                         startTime = location.getTime();
                     }
                     m_locationManger.addLocation(location);
-                    dataSource.createLocation(location);
                     Log.i("LocationHandler", "Distance walked: " + String.valueOf(m_distanceManager.getDistance()));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -113,7 +112,10 @@ public class LocationHandler extends Service {
         stopListening();
         float distance = m_distanceManager.getDistance();
         if (previousBestLocation != null) {
-            dataSource.createDistance(distance, startTime, previousBestLocation.getTime());
+            long foreignkey = dataSource.createDistance(distance, startTime, previousBestLocation.getTime());
+            for (int i = 0; i < m_locationManger.getLocationsSize(); i++) {
+                dataSource.createLocation(m_locationManger.getLocationByIndex(i), foreignkey);
+            }
             Log.i("LocationHandler", "Distance added to Database: " + distance);
         }
         dataSource.close();

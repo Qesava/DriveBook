@@ -52,7 +52,12 @@ public class GPSLocationDBHelper extends SQLiteOpenHelper {
                     FIELD_ROW_ID + " integer primary key autoincrement , " +
                     FIELD_TIME + " long , " +
                     FIELD_LNG + " double , " +
-                    FIELD_LAT + " double " + " ) ";
+                    FIELD_LAT + " double , " +
+                    FIELD_ROW_ID_DIST + " integer , " +
+                    " foreign key ( " +
+                    FIELD_ROW_ID_DIST +
+                    " ) references " +
+                    DATABASE_TABLE_DIST + " (id) " + " ) ";
 
     private static final String SQL_CREATE_D =
             "create table " + DATABASE_TABLE_DIST + " ( " +

@@ -20,7 +20,8 @@ public class GPSLocationDataSource {
             GPSLocationDBHelper.FIELD_ROW_ID,
             GPSLocationDBHelper.FIELD_TIME,
             GPSLocationDBHelper.FIELD_LNG,
-            GPSLocationDBHelper.FIELD_LAT
+            GPSLocationDBHelper.FIELD_LAT,
+            GPSLocationDBHelper.FIELD_ROW_ID_DIST
     };
 
     private String[] columns_dist = {
@@ -46,12 +47,12 @@ public class GPSLocationDataSource {
         dbHelper.close();
     }
 
-    public long createLocation(Location location) {
+    public long createLocation(Location location, long foreignkey) {
         ContentValues values = new ContentValues();
         values.put(GPSLocationDBHelper.FIELD_TIME, location.getTime());
         values.put(GPSLocationDBHelper.FIELD_LNG, location.getLongitude());
         values.put(GPSLocationDBHelper.FIELD_LAT, location.getLatitude());
-
+        values.put(GPSLocationDBHelper.FIELD_ROW_ID_DIST, foreignkey);
         return database.insert(GPSLocationDBHelper.DATABASE_TABLE_LOCA, null, values);
     }
 
@@ -72,7 +73,7 @@ public class GPSLocationDataSource {
 
         long id = cursor.getLong(idInc);
 
-        return new Distance(cursor.getFloat(distance), cursor.getLong(startTime), cursor.getLong(stoptime));
+        return new Distance(cursor.getFloat(distance), cursor.getLong(startTime), cursor.getLong(stoptime), id);
     }
 
     private Location cursorToGPSLocation(Cursor cursor) {
@@ -92,6 +93,26 @@ public class GPSLocationDataSource {
         location.setLongitude(lng);
 
         return location;
+    }
+
+    public List<Location> getLocationsByKey(long key) {
+        List<Location> locations = new ArrayList<>();
+        Cursor cursor = database.query(GPSLocationDBHelper.DATABASE_TABLE_LOCA,
+                columns, null, null, null, null, null);
+
+        cursor.moveToFirst();
+        Location location;
+
+        while (!cursor.isAfterLast()) {
+            long id = cursor.getLong(cursor.getColumnIndex(GPSLocationDBHelper.FIELD_ROW_ID_DIST));
+            if (id == key) {
+                location = cursorToGPSLocation(cursor);
+                locations.add(location);
+            }
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return locations;
     }
 
     public List<Location> getAllGPSLocations() {
